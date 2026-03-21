@@ -19,8 +19,14 @@ repositories {
 }
 
 dependencies {
+    // Tomcat server
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    // AWS SDK for S3
+    implementation 'software.amazon.awssdk:s3:2.25.60'
+
+    // For configuration properties
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-validation:4.0.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

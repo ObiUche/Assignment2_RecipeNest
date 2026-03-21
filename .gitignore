@@ -4,6 +4,19 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+# Ignore local config files that might contain keys
+application-local.properties
+*.key
+*.pem
+
+# Ignore IDE files
+.idea/
+.gradle/
+build/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
 
 ### STS ###
 .apt_generated
