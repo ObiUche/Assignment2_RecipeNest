@@ -25,6 +25,16 @@ dependencies {
     // AWS SDK for S3
     implementation 'software.amazon.awssdk:s3:2.25.60'
 
+    // Spring Secruity
+    implementation 'org.springframework.security:spring-security-core'
+
+    //Spring Jpa
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:4.1.0-M3'
+
+    // h2 db for testing
+    runtimeOnly 'com.h2database:h2'
+
+    implementation 'org.springframework.boot:spring-boot-h2console'
     // For configuration properties
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-validation:4.0.4'
