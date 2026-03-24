@@ -85,9 +85,12 @@ public class Recipe {
     }
 
     public void addPhoto(RecipePhoto photo){
+        if(photo == null){
+            throw new IllegalArgumentException("Photo cannot be null");
+        }
         this.photos.add(photo);
         photo.setRecipe(this);
-        if(this.photos.size() ==1)
+        if(this.photos.size() == 1)
         {
             photo.setPrimary(true);
             this.mainImage = photo.getImageUrl();
@@ -95,6 +98,10 @@ public class Recipe {
     }
 
     public void removePhoto(RecipePhoto photo) {
+
+        if(photo == null){
+            return ;
+        }
         this.photos.remove(photo);
         photo.setRecipe(null);
 

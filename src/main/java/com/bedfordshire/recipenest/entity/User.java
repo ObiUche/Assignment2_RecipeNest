@@ -93,6 +93,21 @@ public class User implements UserDetails {
 
     }
 
+
+    public boolean isLocked(){
+        if(!accountNonLocked  && lockoutTime != null){
+            if (LocalDateTime.now().isAfter(lockoutTime)) {
+                resetFailedLoginAttempts();
+                return false;
+
+            }
+            return true;
+
+        }
+        return false;
+    }
+
+
     public void incrementFailedLoginAttempts(){
         this.failedLoginAttempts++;
         if(this.failedLoginAttempts >= 5){
