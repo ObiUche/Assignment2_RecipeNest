@@ -95,22 +95,32 @@ public class User implements UserDetails {
 
 
     public boolean isLocked(){
-        if(!accountNonLocked  && lockoutTime != null){
-            if (LocalDateTime.now().isAfter(lockoutTime)) {
-                resetFailedLoginAttempts();
-                return false;
-
-            }
-            return true;
-
+        // If account is not locked, return false
+        if (accountNonLocked) {
+            return false;
         }
-        return false;
+
+        // Account is locked, check if lockout has expired
+        if (lockoutTime != null && LocalDateTime.now().isAfter(lockoutTime)) {
+            // Lockout period has expired, unlock the account
+            resetFailedLoginAttempts();
+            return false;
+        }
+
+        // Account is locked (either permanently or lockout not expired)
+        return true;
     }
 
 
     public void incrementFailedLoginAttempts(){
+        // Don't increment if account is already locked
+        if (!this.accountNonLocked) {
+            return;
+        }
+
         this.failedLoginAttempts++;
-        if(this.failedLoginAttempts >= 5){
+
+        if (this.failedLoginAttempts >= 5){
             this.accountNonLocked = false;
             this.lockoutTime = LocalDateTime.now().plusMinutes(30);
         }

@@ -38,6 +38,10 @@ dependencies {
     // For configuration properties
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-validation:4.0.4'
+
+    // Spring Boot Starter Test (includes JUnit 5, Mockito, AssertJ, etc.)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
