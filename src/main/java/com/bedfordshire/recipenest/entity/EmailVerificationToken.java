@@ -19,7 +19,7 @@ public class EmailVerificationToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -31,6 +31,28 @@ public class EmailVerificationToken {
         this.token = UUID.randomUUID().toString();
         this.expiryDate = LocalDateTime.now().plusHours(24);
     }
+
+    public boolean isExpired(){
+        return LocalDateTime.now().isAfter(this.expiryDate);
+    }
+
+    @PrePersist
+    protected void onCreate(){
+        if(token == null){
+            token = UUID.randomUUID().toString();
+        }
+
+        if(expiryDate == null){
+            expiryDate = LocalDateTime.now().plusHours(24);
+        }
+    }
+
+    public void regenerate(){
+        this.token = UUID.randomUUID().toString();
+        this.expiryDate = LocalDateTime.now().plusHours(24);
+    }
+
+
 
     public Long getId() {
         return id;

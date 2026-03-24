@@ -19,7 +19,7 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -29,6 +29,30 @@ public class PasswordResetToken {
         this.user = user;
         this.token = UUID.randomUUID().toString();
         this.expiryDate = LocalDateTime.now().plusHours(24);
+    }
+
+
+   // Check if token is expired
+    public boolean isExpired(){
+        return LocalDateTime.now().isAfter(this.expiryDate);
+    }
+
+
+    //Generate token
+    public void regenerate(){
+        this.token = UUID.randomUUID().toString();
+        this.expiryDate = LocalDateTime.now().plusHours(24);
+    }
+
+    @PrePersist
+    protected void onCreate(){
+        if(token == null){
+            token = UUID.randomUUID().toString();
+        }
+
+        if(expiryDate == null){
+            expiryDate = LocalDateTime.now().plusHours(24);
+        }
     }
 
     public Long getId() {

@@ -13,16 +13,17 @@ public class RecipePhoto {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String imageUrl; // S3/CloudFront URL :)) FIRST TIME USING
 
+    @Column(length = 200)
     private String caption;
 
     @Column(name = "is_primary")
     private boolean isPrimary = false;
 
     @CreationTimestamp
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime uploadDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,7 +36,6 @@ public class RecipePhoto {
     public RecipePhoto(String imageUrl, Recipe recipe){
         this.imageUrl = imageUrl;
         this.recipe = recipe;
-        this.uploadDate = LocalDateTime.now();
     }
 
 

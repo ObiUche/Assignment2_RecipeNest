@@ -1,4 +1,4 @@
-package com.bedfordshire.recipenest;
+package com.bedfordshire.recipenest.configTests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
