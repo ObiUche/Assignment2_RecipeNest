@@ -26,7 +26,7 @@ public class JwtService {
     private String issuer;
 
     // Token validity period in seconds
-    @Value("{jwt.expiration}")
+    @Value("${jwt.expiration}")
     private long accessTokenExpirationSeconds;
 
     public JwtService(JwtEncoder jwtEncoder){
