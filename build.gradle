@@ -19,36 +19,71 @@ repositories {
 }
 
 dependencies {
-    // Tomcat server
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    // AWS SDK for S3
-    implementation 'software.amazon.awssdk:s3:2.25.60'
 
-    // Spring Secruity
-    implementation 'org.springframework.security:spring-security-core'
+    // Web / REST API
 
-    //Spring Jpa
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:4.1.0-M3'
-
-    // JWT Token
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
 
-    // h2 db for testing
+    // Security
+
+    // Core Spring Security starter
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Resource server starter for Bearer token / JWT protected APIs
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    // JWT encode/decode support used by JwtEncoder / JwtDecoder / Nimbus classes
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+
+
+    // Validation
+
+    // For @Valid, @NotBlank, @Email, etc.
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Database / JPA
+    // Spring Data JPA starter
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // H2 for local development / testing
     runtimeOnly 'com.h2database:h2'
 
     implementation 'org.springframework.boot:spring-boot-h2console'
-    // For configuration properties
-    implementation 'org.springframework.boot:spring-boot-configuration-processor'
-    implementation 'org.springframework.boot:spring-boot-starter-validation:4.0.4'
 
-    // Spring Boot Starter Test (includes JUnit 5, Mockito, AssertJ, etc.)
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // Email
+
+    // For email verification and password reset mails
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // =========================
+    // AWS S3
+    // =========================
+
+    // Use the AWS BOM so SDK module versions stay aligned
+    implementation platform('software.amazon.awssdk:bom:2.31.66')
+    implementation 'software.amazon.awssdk:s3'
+
+    // =========================
+    // Build / config helpers
+    // =========================
+
+    // Helps with metadata for configuration properties in IDEs
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // =========================
+    // Tests
+    // =========================
+
+    // Spring Boot test starter
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Spring Security test helpers
+    testImplementation 'org.springframework.security:spring-security-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 tasks.named('test') {
