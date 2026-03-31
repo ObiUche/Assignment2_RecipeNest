@@ -1,6 +1,7 @@
 package com.bedfordshire.recipenest.config;
 
-import org.springframework.beans.factory.BeanRegistrarDslMarker;
+
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,20 +24,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 //JWT API _> Stateless so crsf disabled
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/v1/auth/**", "/h2-console/**")
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()))
 
                 // No http session, every request  must carry its own auth token
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public auth endpoints
-                        .requestMatchers("api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(PathRequest.toH2Console()).permitAll()
 
                         // Public recipe read endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/recipes/**").permitAll()
 
                         // Admin-only endpoints
-                        .requestMatchers("/api/v1/admiin**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         // Everything else requires authentication
                         .anyRequest().authenticated()

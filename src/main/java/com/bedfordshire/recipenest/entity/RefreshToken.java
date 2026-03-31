@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "refresh-tokens")
+@Table(name = "refresh_tokens")
 public class RefreshToken {
 
     @Id
@@ -38,6 +38,11 @@ public class RefreshToken {
         this.token = UUID.randomUUID().toString();
         this.expiryDate = LocalDateTime.now().plusDays(30);
         this.revoked = false;
+    }
+
+    // Marks the token as unusable
+    public void revoke(){
+        this.revoked = true;
     }
 
     // Checks if token should no longer be accepted
