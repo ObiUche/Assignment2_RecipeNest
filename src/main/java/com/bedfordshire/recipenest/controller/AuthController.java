@@ -1,14 +1,9 @@
 package com.bedfordshire.recipenest.controller;
 
 
-import com.bedfordshire.recipenest.dto.auth.AuthResponse;
-import com.bedfordshire.recipenest.dto.auth.ForgotPasswordRequest;
-import com.bedfordshire.recipenest.dto.auth.LoginRequest;
-import com.bedfordshire.recipenest.dto.auth.RefreshTokenRequest;
-import com.bedfordshire.recipenest.dto.auth.RegisterRequest;
-import com.bedfordshire.recipenest.dto.auth.ResetPasswordRequest;
-import com.bedfordshire.recipenest.entity.RefreshToken;
+import com.bedfordshire.recipenest.dto.auth.*;
 import com.bedfordshire.recipenest.service.AuthService;
+import com.bedfordshire.recipenest.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,6 +92,26 @@ public class AuthController {
         authService.resetPassword(request);
 
         // Returns 200 Ok with no body
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request){
+        // Uses the refresh token sent by client and revokes it in the database
+        // so that token can no longer be used to request new access tokens
+        authService.logout(request.refreshToken());
+
+        // Returns 200 Ok with no response body after successful logout
+        return ResponseEntity.ok().build();
+
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Void> resendVerificationEmail(@Valid @RequestBody ResendVerificationRequest request){
+        // Use the email sent by the client to resent email
+        authService.resendVerificationEmail(request);
+
+        // Return 200 ok with no response after success sent
         return ResponseEntity.ok().build();
     }
 

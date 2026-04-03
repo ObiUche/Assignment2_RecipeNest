@@ -1,11 +1,6 @@
 package com.bedfordshire.recipenest.service;
 
-import com.bedfordshire.recipenest.dto.auth.AuthResponse;
-import com.bedfordshire.recipenest.dto.auth.ForgotPasswordRequest;
-import com.bedfordshire.recipenest.dto.auth.LoginRequest;
-import com.bedfordshire.recipenest.dto.auth.RefreshTokenRequest;
-import com.bedfordshire.recipenest.dto.auth.RegisterRequest;
-import com.bedfordshire.recipenest.dto.auth.ResetPasswordRequest;
+import com.bedfordshire.recipenest.dto.auth.*;
 import com.bedfordshire.recipenest.entity.EmailVerificationToken;
 import com.bedfordshire.recipenest.entity.PasswordResetToken;
 import com.bedfordshire.recipenest.entity.RefreshToken;
@@ -18,6 +13,7 @@ import com.bedfordshire.recipenest.repository.UserRepository;
 import com.bedfordshire.recipenest.security.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -125,34 +121,56 @@ public class AuthService {
     }
 
     // Let's spring security verify credentials and issues jwt access * refresh token
-    public AuthResponse login(LoginRequest request){
+    public AuthResponse login(LoginRequest request) {
         // Ask Spring Security to authenticate using email + password
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        // Find user by email
+        User foundUser = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new EntityNotFoundException("No user found"));
+        // Call authentication in try
+        User authenticatedUser;
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+            // As User entity implements UserDetails
+            // Spring returns your User as authenticated principal
+            authenticatedUser = (User) authentication.getPrincipal();
+
+            // Successful login should clear failed previous attempts
+            authenticatedUser.resetFailedLoginAttempts();
+            ;
+            userRepository.save(authenticatedUser);
+
+        } catch (BadCredentialsException e) {
+            // Failed login increments the counter and may lock the account
+            foundUser.incrementFailedLoginAttempts();
+            userRepository.save(foundUser);
+            throw e;
+        }
+
 
         // As User entity implements UserDetails
         // Spring returns your User as authenticated principal
-        User user = (User) authentication.getPrincipal();
+
 
         // Extra safety check: block login if email not verified
-        assert user != null;
-        if(!user.isEmailVerified()){
+        assert authenticatedUser != null;
+        if (!authenticatedUser.isEmailVerified()) {
             throw new DisabledException("Please verify your email before logging in");
         }
 
         // Generate short-lived JWT access token
-        String accessToken = jwtService.generateAccessToken(user);
+        String accessToken = jwtService.generateAccessToken(authenticatedUser);
 
         // Reuse existing refresh token row if present, otherwise create a new one
-        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(authenticatedUser)
                 .map(existingToken -> {
                     existingToken.regenerate();
                     return existingToken;
-                }).orElseGet(() -> new RefreshToken(user));
+                }).orElseGet(() -> new RefreshToken(authenticatedUser));
         refreshTokenRepository.save(refreshToken);
 
         // Return both tokens to the client
@@ -161,8 +179,8 @@ public class AuthService {
                 refreshToken.getToken(),
                 "Bearer",
                 jwtService.getAccessTokenExpirationSeconds(),
-                user.getEmail(),
-                user.getRole().name()
+                authenticatedUser.getEmail(),
+                authenticatedUser.getRole().name()
         );
 
     }
@@ -275,6 +293,33 @@ public class AuthService {
 
         refreshToken.revoke();
         refreshTokenRepository.save(refreshToken);
+    }
+
+
+// Resend email verification email
+    public void resendVerificationEmail(ResendVerificationRequest request){
+        User foundUser = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new EntityNotFoundException("Email is not found"));
+
+
+        if(foundUser.isEmailVerified()){
+            throw new IllegalArgumentException("User already verified");
+        }
+
+        EmailVerificationToken token = emailVerificationTokenRepository.findByUser(foundUser)
+                        .map(existingToken -> {
+                            // Reuse the existing database row and rotate the raw token value
+                            // and expiry time before sending a fresh verifcation email
+                            existingToken.regenerate();
+                            return existingToken;
+                        })
+                                .orElseGet(() -> new EmailVerificationToken(foundUser));
+
+
+        emailVerificationTokenRepository.save(token);
+
+        emailService.sendEmailVerification(foundUser, token.getToken());
+
     }
 
 

@@ -1,13 +1,13 @@
 package com.bedfordshire.recipenest.controller;
 
 import com.bedfordshire.recipenest.dto.auth.AuthResponse;
-import com.bedfordshire.recipenest.entity.UserRole;
+import com.bedfordshire.recipenest.dto.auth.RefreshTokenRequest;
+import com.bedfordshire.recipenest.dto.auth.ResendVerificationRequest;
 import com.bedfordshire.recipenest.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,7 +75,7 @@ public class AuthControllerTest {
                 "Bearer",
                 3600,
                 "obinna@example.com",
-                "USER"
+                "PUBLIC"
         );
 
         when(authService.login(any())).thenReturn(response);
@@ -94,7 +94,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
                 .andExpect(jsonPath("$.email").value("obinna@example.com"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("PUBLIC"));
     }
 
     @Test
@@ -121,5 +121,41 @@ public class AuthControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("Logout should revoke token and return 200")
+    void logout_revokeToken_returnsOk() throws Exception {
+
+        doNothing().when(authService).logout("refreshTokenString");
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                        """
+                         {
+                         "refreshToken" : "refreshTokenString"
+                         }
+                         """
+                )).andExpect(status().isOk());
+
+    }
+
+    @Test
+    @DisplayName("Resend token Email should return 200")
+    void resent_verification_Email_returnsOk() throws Exception {
+
+        ResendVerificationRequest request = new ResendVerificationRequest(
+                "email@example.com"
+        );
+
+        doNothing().when(authService).resendVerificationEmail(request);
+
+        mockMvc.perform(post("/api/v1/auth/resend-verification")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                        "email" : "email@example.com"
+                        }
+                        """)).andExpect(status().isOk());
+    }
 
 }
