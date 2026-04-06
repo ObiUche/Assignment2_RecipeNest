@@ -48,7 +48,10 @@ public record RecipeResponse(
         String chefName,
 
         // Ingredients List
-        List<String> ingredients
+        List<String> ingredients,
+
+        // All uploaded photos linked to this recipe, including primary status
+        List<RecipePhotoResponse> photos
 
 ) {
     public static RecipeResponse from(Recipe recipe){
@@ -67,7 +70,10 @@ public record RecipeResponse(
                 recipe.getCreatedDate(),
                 recipe.getChef() != null ? recipe.getChef().getId() : null,
                 recipe.getChef() != null ? recipe.getChef().getFullName() : null,
-                recipe.getIngredients()
+                recipe.getIngredients(),
+                recipe.getPhotos().stream()
+                        .map(RecipePhotoResponse :: from)
+                        .toList()
 
         );
     }

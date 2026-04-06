@@ -60,7 +60,7 @@ public class SecurityConfig {
     /**
      * Converts JWT claim "roles" into Spring authorities.
      * Example JWT claim:
-     * "roles": [ROLE_CHEF"]
+     * "roles": [ROLES_CHEF"]
      *
      * Then @PreAuthorize("hasRole('CHEF')") works.
      */

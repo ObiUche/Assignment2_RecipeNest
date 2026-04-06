@@ -5,6 +5,7 @@ import com.bedfordshire.recipenest.dto.recipe.RecipeCreateRequest;
 import com.bedfordshire.recipenest.dto.recipe.RecipeResponse;
 import com.bedfordshire.recipenest.dto.recipe.RecipeUpdateRequest;
 import com.bedfordshire.recipenest.service.RecipeService;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class RecipeController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/photos")
+    @PostMapping(value = "/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('CHEF','ADMIN')")
     public ResponseEntity<RecipeResponse> uploadPhoto(
             @PathVariable Long id,
@@ -76,7 +77,7 @@ public class RecipeController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{recipeId}/photos/{photoId}")
+    @PutMapping(value = "/{recipeId}/photos/{photoId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('CHEF','ADMIN')")
     public ResponseEntity<RecipeResponse> replaceRecipePhoto(
             @PathVariable Long recipeId,

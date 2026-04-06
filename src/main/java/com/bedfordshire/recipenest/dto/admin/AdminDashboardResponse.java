@@ -13,7 +13,7 @@ public record AdminDashboardResponse(
         long totalPublicUsers,
 
         // Number of users with ADMIN role
-        long totalAdmin,
+        long totalAdmins,
 
         // Number of users who have verified their email
         long totalVerifiedUsers,

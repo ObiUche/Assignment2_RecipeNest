@@ -3,7 +3,6 @@ package com.bedfordshire.recipenest.controller;
 
 import com.bedfordshire.recipenest.dto.auth.*;
 import com.bedfordshire.recipenest.service.AuthService;
-import com.bedfordshire.recipenest.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

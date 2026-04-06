@@ -141,7 +141,7 @@ public class AuthService {
 
             // Successful login should clear failed previous attempts
             authenticatedUser.resetFailedLoginAttempts();
-            ;
+
             userRepository.save(authenticatedUser);
 
         } catch (BadCredentialsException e) {
@@ -157,7 +157,6 @@ public class AuthService {
 
 
         // Extra safety check: block login if email not verified
-        assert authenticatedUser != null;
         if (!authenticatedUser.isEmailVerified()) {
             throw new DisabledException("Please verify your email before logging in");
         }
@@ -299,7 +298,7 @@ public class AuthService {
 // Resend email verification email
     public void resendVerificationEmail(ResendVerificationRequest request){
         User foundUser = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new EntityNotFoundException("Email is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User is not found"));
 
 
         if(foundUser.isEmailVerified()){
