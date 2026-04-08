@@ -1,7 +1,5 @@
 package com.bedfordshire.recipenest.config;
 
-
-import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,23 +24,23 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> {})
-                //JWT API _> Stateless so crsf disabled
+                // JWT API -> stateless, so disable CSRF for auth endpoints
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/v1/auth/**", "/h2-console/**")
+                        .ignoringRequestMatchers("/api/v1/auth/**")
                 )
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin()))
 
-                // No http session, every request  must carry its own auth token
+                // No HTTP session, every request must carry its own auth token
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
                         // Public auth endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(PathRequest.toH2Console()).permitAll()
+
+                        // Public chef profile endpoint
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/*/public").permitAll()
 
                         // Public recipe read endpoints
@@ -55,32 +53,32 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // Tell spring security to read Bearer JWTS from Authorization header
+                // Tell Spring Security to read Bearer JWTs from Authorization header
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 );
+
         return http.build();
     }
 
     /**
      * Converts JWT claim "roles" into Spring authorities.
      * Example JWT claim:
-     * "roles": [ROLES_CHEF"]
+     * "roles": ["ROLE_CHEF"]
      *
      * Then @PreAuthorize("hasRole('CHEF')") works.
      */
-
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter =
                 new JwtGrantedAuthoritiesConverter();
 
         // Read authorities from the "roles" claim
         authoritiesConverter.setAuthoritiesClaimName("roles");
 
-        // No extra prefix added, because token already stores ROLE_"
+        // No extra prefix added, because token already stores ROLE_
         authoritiesConverter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -93,20 +91,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
-    ) throws Exception{
+    ) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
-        // Allow requests from the front end on local:3000
+    public CorsConfigurationSource corsConfigurationSource() {
+        // Allow requests from the frontend on localhost:3000
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
@@ -120,7 +118,3 @@ public class SecurityConfig {
         return source;
     }
 }
-
-
-
-
