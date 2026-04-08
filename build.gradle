@@ -47,12 +47,11 @@ dependencies {
     // Spring Data JPA starter
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // H2 for local development / testing
-    runtimeOnly 'com.h2database:h2'
-
-    implementation 'org.springframework.boot:spring-boot-h2console'
 
 
+    // postgres db
+
+    runtimeOnly 'org.postgresql:postgresql'
     // Email
 
     // For email verification and password reset mails
