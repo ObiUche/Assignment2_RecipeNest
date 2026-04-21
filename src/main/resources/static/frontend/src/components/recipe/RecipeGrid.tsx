@@ -5,9 +5,18 @@ import { RecipeCard } from './RecipeCard';
 interface RecipeGridProps {
   recipes: Recipe[];
   showEditButton?: boolean;
+  showDeleteButton?: boolean;
+  deletingRecipeId?: number | null;
+  onDeleteRecipe?: (recipeId: number) => void;
 }
 
-export const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, showEditButton = false }) => {
+export const RecipeGrid: React.FC<RecipeGridProps> = ({
+  recipes,
+  showEditButton = false,
+  showDeleteButton = false,
+  deletingRecipeId = null,
+  onDeleteRecipe
+}) => {
   const styles = {
     grid: {
       display: 'grid',
@@ -27,11 +36,14 @@ export const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, showEditButton 
 
   return (
     <div style={styles.grid}>
-      {recipes.map(recipe => (
-        <RecipeCard 
-          key={recipe.id} 
-          recipe={recipe} 
+      {recipes.map((recipe) => (
+        <RecipeCard
+          key={recipe.id}
+          recipe={recipe}
           showEditButton={showEditButton}
+          showDeleteButton={showDeleteButton}
+          isDeleting={deletingRecipeId === recipe.id}
+          onDelete={onDeleteRecipe}
         />
       ))}
     </div>

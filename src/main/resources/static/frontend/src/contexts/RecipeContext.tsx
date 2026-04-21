@@ -42,11 +42,19 @@ export const RecipeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return recipes.filter((recipe) => recipe.chefId === chefId);
   };
 
+  const removeRecipe = (recipeId: number): void => {
+    // Remove one recipe from shared context state by id.
+    setRecipes((previousRecipes) =>
+      previousRecipes.filter((recipe) => recipe.id !== recipeId)
+    );
+  };
+
   const value: RecipeState = {
     recipes,
     setRecipes,
     getRecipe,
-    getUserRecipes
+    getUserRecipes,
+    removeRecipe
   };
 
   return <RecipeContext.Provider value={value}>{children}</RecipeContext.Provider>;

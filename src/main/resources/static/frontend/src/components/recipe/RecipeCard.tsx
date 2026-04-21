@@ -7,9 +7,18 @@ import { Button } from '../common/Button';
 interface RecipeCardProps {
   recipe: Recipe;
   showEditButton?: boolean;
+  showDeleteButton?: boolean;
+  isDeleting?: boolean;
+  onDelete?: (recipeId: number) => void;
 }
 
-export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, showEditButton = false }) => {
+export const RecipeCard: React.FC<RecipeCardProps> = ({
+  recipe,
+  showEditButton = false,
+  showDeleteButton = false,
+  isDeleting = false,
+  onDelete
+}) => {
   return (
     <Card>
       {/* Wrap the main card content in a recipe-detail link so users can open the full recipe */}
@@ -49,9 +58,22 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, showEditButton =
       </Link>
 
       {showEditButton ? (
-        <Button to={`/recipe/edit/${recipe.id}`} variant="secondary">
-          Edit Recipe
-        </Button>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <Button to={`/recipe/edit/${recipe.id}`} variant="secondary">
+            Edit Recipe
+          </Button>
+
+          {showDeleteButton && onDelete && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onDelete(recipe.id)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Recipe'}
+            </Button>
+          )}
+        </div>
       ) : (
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Button to={`/recipes/${recipe.id}`} variant="secondary">

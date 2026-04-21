@@ -136,6 +136,25 @@ export const setPrimaryRecipePhoto = async (
   return response.json();
 };
 
+export const deleteRecipe = async (
+  recipeId: number,
+  accessToken: string
+): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/recipes/${recipeId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `Delete recipe failed: ${response.status} ${response.statusText} ${errorText}`
+    );
+  }
+};
+
 export const deleteRecipePhoto = async (
   recipeId: number,
   photoId: number,

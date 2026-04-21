@@ -144,6 +144,7 @@ export interface RecipeState {
   setRecipes: (recipes: Recipe[]) => void;
   getRecipe: (id: number) => Recipe | undefined;
   getUserRecipes: (chefId: number) => Recipe[];
+  removeRecipe: (recipeId: number) => void;
 }
 
 // Public chef profile returned by GET /api/v1/users/{id}/public
