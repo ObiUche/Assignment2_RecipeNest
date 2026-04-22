@@ -48,3 +48,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+## dev secrets ###
+src/main/resources/application-dev.properties
