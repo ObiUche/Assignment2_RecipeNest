@@ -132,9 +132,14 @@ export interface AuthState {
     email: string,
     password: string,
     role: UserRole
-  ) => Promise<boolean>;
+  ) => Promise<RegisterResult>;
   updateMyProfile?: (request: UserUpdateRequest) => Promise<boolean>;
   uploadProfilePhoto?: (file: File) => Promise<boolean>;
+}
+
+export type RegisterResult = {
+  success: boolean;
+  message?: string;
 }
 
 // Recipe context contract used by recipe pages.

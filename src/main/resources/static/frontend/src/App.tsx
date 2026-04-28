@@ -19,6 +19,7 @@ import { EditChefProfile } from './pages/EditChefProfile';
 import { ChangePassword } from './pages/ChangePassword';
 import { SupervisorPanel } from './pages/SupervisorPanel';
 import { RecipeDetail } from './pages/RecipeDetail';
+import { VerifyEmail } from './pages/VerifyEmail';
 
 // Protected route wrapper used for pages that require login,
 // and optionally a specific backend role such as CHEF or ADMIN.
@@ -55,6 +56,7 @@ function AppContent() {
         <Route path="/recipes" element={<ViewRecipes />} />
         <Route path="/chef/:id" element={<ChefProfile />} />
         <Route path="/recipes/:id" element = {<RecipeDetail />}/>
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected routes for chefs who manage recipes */}
         <Route

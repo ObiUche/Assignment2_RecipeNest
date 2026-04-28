@@ -6,6 +6,7 @@ import { StatCard } from '../components/common/StatCard';
 import { useAuth } from '../contexts/AuthContext';
 import { useRecipes } from '../contexts/RecipeContext';
 import { deleteRecipe } from '../api/recipeApi';
+import { idText } from 'typescript';
 
 export const ChefDashboard: React.FC = () => {
   // Read the logged-in user from auth context.
@@ -14,6 +15,7 @@ export const ChefDashboard: React.FC = () => {
 
   // Read the recipe list from recipe context.
   const { recipes, removeRecipe } = useRecipes();
+  const chefRecipes = recipes.filter(recipe => recipe.chefId === user?.id);
 
   // Prefer first name for a friendlier greeting, then fall back to email.
   const displayName = user?.firstName || user?.email || 'Chef';
@@ -70,7 +72,7 @@ export const ChefDashboard: React.FC = () => {
 
       <div style={{ marginBottom: '32px' }}>
         {/* Temporary recipe stat based on the currently loaded recipe list */}
-        <StatCard label="Recipes" value={recipes.length} />
+        <StatCard label="Recipes" value={chefRecipes.length} />
       </div>
 
       <div style={{ marginBottom: '32px' }}>
@@ -82,7 +84,7 @@ export const ChefDashboard: React.FC = () => {
 
       {/* Show the currently loaded recipes for the chef dashboard */}
       <RecipeGrid
-        recipes={recipes}
+        recipes={chefRecipes}
         showEditButton={true}
         showDeleteButton={true}
         deletingRecipeId={deletingRecipeId}

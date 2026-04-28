@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: recipenest-postgres
+    environment:
+      POSTGRES_DB: recipenest
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - recipenest_postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: recipenest-backend
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/recipenest
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_URL: http://localhost:3000
+      SPRING_PROFILES_ACTIVE: dev
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+volumes:
+    recipenest_postgres_data:
+

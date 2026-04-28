@@ -9,6 +9,11 @@ application-local.properties
 *.key
 *.pem
 
+
+
+# Ignore the ENV file
+.env
+
 # Ignore IDE files
 .idea/
 .gradle/

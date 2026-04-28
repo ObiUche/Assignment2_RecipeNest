@@ -3,6 +3,7 @@ import {
   AuthResponse,
   AuthState,
   AuthUser,
+  RegisterResult,
   UserProfile,
   UserRole,
   UserUpdateRequest
@@ -19,9 +20,47 @@ const API_BASE_URL = 'http://localhost:8080/api/v1';
 // Small helper key so auth data is stored consistently in localStorage.
 const AUTH_STORAGE_KEY = 'recipenest_auth';
 
+// Reads backend error responses and turns them into a user-friendly message.
+// This supports plain text errors and common JSON error shapes from Spring Boot.
+const extractErrorMessage = async (response: Response): Promise<string> => {
+  const responseText = await response.text();
+
+  if (!responseText) {
+    return `${response.status} ${response.statusText}`;
+  }
+
+  try {
+    const parsed = JSON.parse(responseText);
+
+    if (typeof parsed.message === 'string') {
+      return parsed.message;
+    }
+
+    if (typeof parsed.error === 'string') {
+      return parsed.error;
+    }
+
+    if (typeof parsed.detail === 'string') {
+      return parsed.detail;
+    }
+
+    if (Array.isArray(parsed.errors)) {
+      return parsed.errors.join(', ');
+    }
+
+    if (typeof parsed.errors === 'object' && parsed.errors !== null) {
+      return Object.values(parsed.errors).join(', ');
+    }
+
+    return responseText;
+  } catch {
+    return responseText;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Logged-in user state shared across the app.
-  // It stores auth tokens together with the current users profile details.
+  // It stores auth tokens together with the current user's profile details.
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
@@ -44,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchMyProfile = async (accessToken: string): Promise<UserProfile | null> => {
     try {
-      // Load the current logged-in users profile from the backend
+      // Load the current logged-in user's profile from the backend
       // so the frontend has real profile data instead of only email and role.
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'GET',
@@ -67,8 +106,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Call the real backend login endpoint and send the credentials as JSON.
-      // This matches the Spring Boot controller because login uses @RequestBody.
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -80,15 +117,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
       });
 
-      // Return false for invalid login instead of crashing the UI.
       if (!response.ok) {
         return false;
       }
 
       const data: AuthResponse = await response.json();
-
-      // Load the full profile after login so the app can render first name,
-      // bio, and other editable profile fields.
       const profile = await fetchMyProfile(data.accessToken);
 
       const loggedInUser: AuthUser = {
@@ -145,10 +178,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string,
     password: string,
     role: UserRole
-  ): Promise<boolean> => {
+  ): Promise<RegisterResult> => {
     try {
-      // Call the real backend register endpoint.
-      // Registration returns success with no auth body, so success is based on response.ok.
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -163,21 +194,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
       });
 
-      return response.ok;
+      if (!response.ok) {
+        const message = await extractErrorMessage(response);
+
+        return {
+          success: false,
+          message
+        };
+      }
+
+      return {
+        success: true
+      };
     } catch (error) {
       console.error('Registration failed', error);
-      return false;
+
+      return {
+        success: false,
+        message: 'Unable to connect to the server. Please try again.'
+      };
     }
   };
 
   const updateMyProfile = async (request: UserUpdateRequest): Promise<boolean> => {
-    // A logged-in user and access token are required before profile updates can be sent.
     if (!user?.accessToken) {
       return false;
     }
 
     try {
-      // Send a partial text profile update to the backend using the current access token.
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PATCH',
         headers: {
@@ -193,8 +237,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const updatedProfile: UserProfile = await response.json();
 
-      // Merge the updated backend profile with the existing auth tokens
-      // so the user stays logged in after editing their profile.
       const updatedUser: AuthUser = {
         ...user,
         id: updatedProfile.id,
@@ -220,14 +262,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const uploadProfilePhoto = async (file: File): Promise<boolean> => {
-    // A logged-in user and access token are required before photo upload can be sent.
     if (!user?.accessToken) {
       return false;
     }
 
     try {
-      // Build a multipart request because the backend photo endpoint
-      // accepts a real uploaded file instead of JSON text data.
       const formData = new FormData();
       formData.append('file', file);
 
@@ -245,8 +284,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const updatedProfile: UserProfile = await response.json();
 
-      // Merge the updated backend profile with the existing auth tokens
-      // so the user stays logged in after uploading a new profile image.
       const updatedUser: AuthUser = {
         ...user,
         id: updatedProfile.id,
@@ -271,7 +308,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Expose only the state and actions the rest of the app should use.
   const value: AuthState = {
     user,
     login,
@@ -284,7 +320,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook keeps auth access consistent and avoids repeating useContext logic.
 export const useAuth = (): AuthState => {
   const context = useContext(AuthContext);
 

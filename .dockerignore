@@ -1,0 +1,30 @@
+# Ignore Git files because they are not needed inside the Docker build context
+.git
+.gitignore
+
+# Ignore IDE/editor files that do not affect the application build
+.idea
+.vscode
+*.iml
+
+# Ignore Gradle build outputs because the image rebuilds the jar itself
+build
+.gradle
+
+# Ignore frontend dependencies and build output to keep Docker build smaller
+src/main/resources/static/frontend/node_modules
+src/main/resources/static/frontend/build
+src/main/resources/static/frontend/dist
+
+# Ignore local secret/profile files
+src/main/resources/application-dev.properties
+.env
+*.env
+
+# Ignore OS/system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs

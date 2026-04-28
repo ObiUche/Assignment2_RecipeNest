@@ -8,6 +8,7 @@ import { Card } from '../components/common/Card';
 
 export const Login: React.FC = () => {
   // Local form state for the login inputs and simple UI feedback.
+    const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -80,11 +81,25 @@ export const Login: React.FC = () => {
 
             <Input
               label="Password"
-              type="password"
+              type= {showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+                    <button
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+              style={{
+                marginBottom: '16px',
+                background: 'none',
+                border: 'none',
+                color: '#2563EB',
+                cursor: 'pointer',
+                padding: 0
+              }}
+            >
+              {showPassword ? 'Hide password' : 'Show password'}
+            </button>
 
             <Button type="submit" fullWidth disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}

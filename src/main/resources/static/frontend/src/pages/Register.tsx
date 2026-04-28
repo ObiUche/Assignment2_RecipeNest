@@ -8,7 +8,7 @@ import { Card } from '../components/common/Card';
 import { UserRole } from '../types';
 
 export const Register: React.FC = () => {
-  // Keep register form state aligned with the backend request DTO
+  // Keep register form state aligned with the backend request DTO.
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -17,6 +17,8 @@ export const Register: React.FC = () => {
     confirmPassword: '',
     role: 'PUBLIC' as UserRole
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -28,36 +30,43 @@ export const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Stop obvious password mismatch before making the backend request
+    // Clear old messages before validating this new submit attempt.
+    setError('');
+    setSuccessMessage('');
+
+    // Stop obvious password mismatch before making the backend request.
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
-    setError('');
-    setSuccessMessage('');
 
-    const success = await register(
-      formData.firstname,
-      formData.lastname,
-      formData.email,
-      formData.password,
-      formData.role
-    );
+    try {
+      const result = await register(
+        formData.firstname,
+        formData.lastname,
+        formData.email,
+        formData.password,
+        formData.role
+      );
 
-    if (success) {
-      // Registration in your backend creates the account but still requires
-      // email verification before the user can log in successfully.
-      setSuccessMessage('Registration successful. Please verify your email before logging in.');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
-    } else {
-      setError('Registration failed');
+      if (result.success) {
+        // Registration creates the account but still requires email verification.
+        setSuccessMessage('Registration successful. Please verify your email before logging in.');
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+
+        return;
+      }
+
+      setError(result.message || 'Registration failed');
+    } finally {
+      // Always stop the loading state, even if registration fails.
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -119,7 +128,7 @@ export const Register: React.FC = () => {
 
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
@@ -127,11 +136,26 @@ export const Register: React.FC = () => {
 
             <Input
               label="Confirm Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+              style={{
+                marginBottom: '16px',
+                background: 'none',
+                border: 'none',
+                color: '#2563EB',
+                cursor: 'pointer',
+                padding: 0
+              }}
+            >
+              {showPassword ? 'Hide password' : 'Show password'}
+            </button>
+
 
             <div style={{ marginBottom: '16px' }}>
               <label

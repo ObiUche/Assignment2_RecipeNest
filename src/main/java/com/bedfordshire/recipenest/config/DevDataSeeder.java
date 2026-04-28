@@ -53,6 +53,21 @@ public class DevDataSeeder implements CommandLineRunner {
         admin.setRole(UserRole.ADMIN);
         admin.setEmailVerified(true);
 
+
+        User chef2 = new User(
+                "Oliver",
+                "Twist",
+                "chef2@recipenest.com",
+                passwordEncoder.encode("Password123")
+        );
+        chef2.setRole(UserRole.CHEF);
+        chef2.setEmailVerified(true);
+        chef2.setCuisineSpeciality("English");
+        chef2.setLocation("Manchester");
+        chef2.setBio("Chef focused on traditional English dishes");
+
+
+
         // Create one chef user
         User chef = new User(
                 "Obinna",
