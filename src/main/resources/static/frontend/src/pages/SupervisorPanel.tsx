@@ -5,7 +5,7 @@ import { Card } from '../components/common/Card';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDashboard } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const SupervisorPanel: React.FC = () => {
   // Read the logged-in user so the admin token can be sent to the backend.

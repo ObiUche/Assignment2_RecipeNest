@@ -6,7 +6,7 @@ import { Button } from '../components/common/Button';
 import { useRecipes } from '../contexts/RecipeContext';
 import { Recipe } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const RecipeDetail: React.FC = () => {
   // Read the recipe id from the URL

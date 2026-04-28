@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { PageContainer } from '../components/layout/PageContainer';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const VerifyEmail: React.FC = () => {
   // Read the token from the email link, for example:

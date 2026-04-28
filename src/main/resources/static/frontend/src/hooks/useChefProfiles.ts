@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PublicChefProfile } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const useChefProfiles = (chefIds: number[]) => {
   // Store fetched chef profiles by chef id for quick lookup.

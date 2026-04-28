@@ -7,7 +7,7 @@ import { Card } from '../components/common/Card';
 
 // Keep the backend base URL local to this page for now.
 // This matches your Spring Boot auth routes under /api/v1/auth.
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const ResetPassword: React.FC = () => {
   // Read the reset token from the URL query string, for example:

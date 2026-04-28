@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 
 // Keep the backend base URL in one place for now.
 // Later this can move into a dedicated API client file.
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 // Small helper key so auth data is stored consistently in localStorage.
 const AUTH_STORAGE_KEY = 'recipenest_auth';

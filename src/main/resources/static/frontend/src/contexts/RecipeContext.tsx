@@ -5,7 +5,7 @@ const RecipeContext = createContext<RecipeState | undefined>(undefined);
 
 // Keep backend base URL in one place for now.
 // Later this can move into a shared API client file.
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL =   process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const RecipeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Shared recipe state used by recipe pages across the app.
