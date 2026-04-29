@@ -111,7 +111,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         // Allow requests from the frontend on localhost:3000
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", frontendURL));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://therecipenest.vercel.app", frontendURL));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
