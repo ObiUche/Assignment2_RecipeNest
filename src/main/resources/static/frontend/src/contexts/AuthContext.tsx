@@ -32,6 +32,12 @@ const extractErrorMessage = async (response: Response): Promise<string> => {
   try {
     const parsed = JSON.parse(responseText);
 
+    // Backend validation errors are stored in "fields", so show these first
+    // instead of the generic top-level "Validation failed" message.
+    if (typeof parsed.fields === 'object' && parsed.fields !== null) {
+      return Object.values(parsed.fields).join(', ');
+    }
+
     if (typeof parsed.message === 'string') {
       return parsed.message;
     }
